@@ -4,6 +4,11 @@ Shorty is a toy project showcasing a simple link shortener built on top of Redis
 Docker. If shorty is running in Docker, Redis persistently saves data into volume `redis-data` described in
 docker-compose.yml
 
+## Dependencies
+
+- `go 1.15`
+- `docker`
+
 ## API
 
 ```
