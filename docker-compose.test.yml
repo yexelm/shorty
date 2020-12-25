@@ -1,0 +1,32 @@
+version: '3'
+
+services:
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile.test
+    ports:
+      - "8080:8080"
+    restart: "no"
+    security_opt:
+      - apparmor:unconfined
+    depends_on:
+      - redis
+    environment:
+      REDIS_URL: redis:6379
+      TEST_DB_1: 12
+      TEST_DB_2: 13
+    networks: #
+      - backend
+
+  redis:
+    image: "redis:alpine"
+    restart: unless-stopped
+    security_opt:
+      - apparmor:unconfined
+    networks:
+      - backend
+
+networks:
+  backend:
