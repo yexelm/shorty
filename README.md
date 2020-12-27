@@ -1,7 +1,9 @@
+[![Go Report Card](https://goreportcard.com/badge/github.com/yexelm/shorty)](https://goreportcard.com/report/github.com/yexelm/shorty)
+
 # Description
 
-Shorty is a toy project showcasing a simple link shortener built on top of Redis. It can be run either locally or in
-Docker. If shorty is running in Docker, Redis persistently saves data into volume `redis-data` described in
+Shorty is a practice project showcasing a simple link shortener built on top of Redis. It can be run either locally or
+in Docker. If shorty is running in Docker, Redis persistently saves data into volume `redis-data` described in
 docker-compose.yml
 
 ## Dependencies
