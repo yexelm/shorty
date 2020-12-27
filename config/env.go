@@ -2,11 +2,10 @@ package config
 
 import "os"
 
+// GetEnv fallbacks env variable to default value if it was not set
 func GetEnv(key, defaultValue string) string {
-	v := os.Getenv(key)
-	if v == "" {
-		return defaultValue
+	if v, ok := os.LookupEnv(key); ok {
+		return v
 	}
-	return v
+	return defaultValue
 }
-

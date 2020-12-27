@@ -33,4 +33,3 @@ func main() {
 
 	log.Println("application stopped")
 }
-
