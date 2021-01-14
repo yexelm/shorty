@@ -20,10 +20,10 @@ POST /
 Save a full URL passed through POST request body in Redis and receive a unique short alias for it
 
 ```
-GET /:short_alias
+GET /<short_alias>
 ```
 
-Retrieve original full URL saved into Redis earlier by its short_alias
+Retrieve original full URL saved into Redis earlier by its <short_alias>
 
 ## Env variables
 
