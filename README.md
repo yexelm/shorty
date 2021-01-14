@@ -35,7 +35,7 @@ Retrieve original full URL saved into Redis earlier by its short_alias
 
 ## Make commands
 
-```shell
+```
 make test
 ```
 
