@@ -12,13 +12,12 @@ import (
 var db *Storage
 
 func TestMain(m *testing.M) {
-	dbPort := config.GetEnv("REDIS_URL", "localhost:6379")
-	dbNum := config.GetEnv("TEST_DB_1", "12")
+	cfg := config.New()
 
-	db, _ = New(dbPort, dbNum)
+	db, _ = New(cfg.RedisURL, cfg.TestStorageDb)
 	code := m.Run()
-	c := db.Pool.Get()
-	c.Do("FLUSHDB")
+	conn := db.Pool.Get()
+	_, _ = conn.Do("FLUSHDB")
 	db.Close()
 	os.Exit(code)
 }
@@ -75,7 +74,7 @@ func TestShortByLong(t *testing.T) {
 // short alias correctly afterwards.
 func TestSaveFullLongByShort(t *testing.T) {
 	const (
-		urlsNum = 10000
+		urlsNum = 1000
 	)
 
 	buf := make([]byte, 100)

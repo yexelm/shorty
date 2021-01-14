@@ -2,6 +2,7 @@ package app
 
 import (
 	"bytes"
+	"errors"
 	"io/ioutil"
 	"net/http"
 	"strings"
@@ -9,9 +10,14 @@ import (
 	"github.com/gomodule/redigo/redis"
 )
 
+var (
+	errEmptyShortCode    = errors.New("empty short code")
+	errEmptyRequestBody  = errors.New("empty request body")
+	errShortCodeNotFound = errors.New("the requested short code not found")
+)
+
 func (a *App) newAPI() http.Handler {
 	m := http.NewServeMux()
-
 	m.HandleFunc("/", a.Shorty)
 
 	return m
@@ -25,14 +31,14 @@ func (a *App) Shorty(w http.ResponseWriter, r *http.Request) {
 	case http.MethodGet:
 		short := []byte(strings.TrimPrefix(r.URL.Path, "/"))
 		if len(short) == 0 {
-			http.Error(w, "empty short code", http.StatusBadRequest)
+			http.Error(w, errEmptyShortCode.Error(), http.StatusBadRequest)
 			return
 		}
 
 		long, err := a.db.LongByShort(short)
 		if err != nil {
 			if err == redis.ErrNil {
-				http.Error(w, redis.ErrNil.Error(), http.StatusNotFound)
+				http.Error(w, errShortCodeNotFound.Error(), http.StatusNotFound)
 				return
 			}
 			http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -47,7 +53,7 @@ func (a *App) Shorty(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		if len(longURL) == 0 {
-			http.Error(w, "request body is empty", http.StatusBadRequest)
+			http.Error(w, errEmptyRequestBody.Error(), http.StatusBadRequest)
 			return
 		}
 

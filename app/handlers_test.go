@@ -8,24 +8,21 @@ import (
 	"os"
 	"testing"
 
-	"github.com/gomodule/redigo/redis"
 	"github.com/yexelm/shorty/config"
 	"github.com/yexelm/shorty/store"
 )
 
-var a *App
+var app *App
 
 func TestMain(m *testing.M) {
-	dbPort := config.GetEnv("REDIS_URL", "localhost:6379")
-	appPort := config.GetEnv("APP_PORT", ":8080")
-	dbNum := config.GetEnv("TEST_DB_2", "13")
+	cfg := config.New()
 
-	db, _ := store.New(dbPort, dbNum)
-	a = New(db, appPort)
+	db, _ := store.New(cfg.RedisURL, cfg.TestHandlersDb)
+	app = New(db, cfg.HostPort)
 	code := m.Run()
-	c := db.Pool.Get()
-	c.Do("FLUSHDB")
-	a.Stop()
+	conn := db.Pool.Get()
+	_, _ = conn.Do("FLUSHDB")
+	app.Stop()
 	os.Exit(code)
 }
 
@@ -65,7 +62,7 @@ func TestShortyPostAndGet(t *testing.T) {
 			url:      "/",
 			body:     nil,
 			wantCode: http.StatusBadRequest,
-			wantBody: "empty short code\n",
+			wantBody: errEmptyShortCode.Error() + "\n",
 		},
 		{
 			name:     "wrong method",
@@ -83,7 +80,7 @@ func TestShortyPostAndGet(t *testing.T) {
 			url:      "/c",
 			body:     nil,
 			wantCode: http.StatusNotFound,
-			wantBody: redis.ErrNil.Error() + "\n",
+			wantBody: errShortCodeNotFound.Error() + "\n",
 		},
 		{
 			name:     "empty POST request body",
@@ -92,14 +89,14 @@ func TestShortyPostAndGet(t *testing.T) {
 			url:      "",
 			body:     bytes.NewReader([]byte("")),
 			wantCode: http.StatusBadRequest,
-			wantBody: "request body is empty\n",
+			wantBody: errEmptyRequestBody.Error() + "\n",
 		},
 	}
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
 			req, _ := http.NewRequest(tc.method, tc.url, tc.body)
-			a.Shorty(tc.recorder, req)
+			app.Shorty(tc.recorder, req)
 
 			gotCode := tc.recorder.Code
 			if gotCode != tc.wantCode {

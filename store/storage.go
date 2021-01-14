@@ -3,7 +3,6 @@ package store
 import (
 	"bytes"
 	"log"
-	"strconv"
 
 	"github.com/gomodule/redigo/redis"
 )
@@ -23,9 +22,9 @@ type Storage struct {
 }
 
 // New returns an instance of Storage.
-func New(redisURL string, dbNum string) (*Storage, error) {
+func New(redisURL string, db int) (*Storage, error) {
 	s := Storage{
-		Pool:      newPool(redisURL, dbNum),
+		Pool:      newPool(redisURL, db),
 		IDChannel: make(chan int),
 	}
 
@@ -98,14 +97,7 @@ func (s *Storage) retrieveLastID() (int, error) {
 	}
 }
 
-func newPool(redisURL string, dbNum string) *redis.Pool {
-	db, err := strconv.Atoi(dbNum)
-	if err != nil {
-		const defaultDB = 13
-		db = defaultDB
-		log.Printf("failed to derive value for db number: %v, proceeding with default value: %v", dbNum, defaultDB)
-	}
-
+func newPool(redisURL string, db int) *redis.Pool {
 	p := redis.Pool{
 		Dial: func() (redis.Conn, error) {
 			return redis.Dial("tcp", redisURL, redis.DialDatabase(db))

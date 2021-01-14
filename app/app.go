@@ -4,6 +4,7 @@ import (
 	"context"
 	"log"
 	"net/http"
+	"strconv"
 	"time"
 
 	"github.com/yexelm/shorty/store"
@@ -16,11 +17,11 @@ type App struct {
 }
 
 // New returns an instance of the application server.
-func New(storage *store.Storage, appPort string) *App {
+func New(storage *store.Storage, appPort int) *App {
 	s := App{db: storage}
 
 	s.server = &http.Server{
-		Addr:         appPort,
+		Addr:         ":" + strconv.Itoa(appPort),
 		ReadTimeout:  time.Second,
 		WriteTimeout: time.Second,
 		Handler:      s.newAPI(),
@@ -30,7 +31,7 @@ func New(storage *store.Storage, appPort string) *App {
 }
 
 // Serve starts the application server.
-func (a *App) Serve(port string) {
+func (a *App) Serve(port int) {
 	go func() {
 		if err := a.server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 			log.Printf("app server error: %v", err)

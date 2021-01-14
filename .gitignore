@@ -5,10 +5,8 @@
 *.so
 *.dylib
 
-# Output of the go coverage tool,
+# Output of the go coverage tool
 *.out
 
-# Dependency directories (remove the comment below to include it)
-# vendor/
-
+# idea
 .idea

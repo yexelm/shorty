@@ -1,24 +1,23 @@
-version: '3'
-
+version: "3.8"
 
 services:
 
   app:
+    env_file:
+      - .env
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.dev
     ports:
-      - "8080:8080"
+      - ${HOST_PORT}:${CONTAINER_PORT}
     restart: unless-stopped
     security_opt:
       - apparmor:unconfined
     depends_on:
       - redis
     environment:
-      REDIS_URL: redis:6379
-      DB_NUM: 0
-    networks:
-      - backend
+      REDIS_URL: ${REDIS_URL}
+      DB_NUM: ${DB_NUM}
 
   redis:
     image: "redis:alpine"
@@ -28,11 +27,7 @@ services:
     restart: unless-stopped
     security_opt:
       - apparmor:unconfined
-    networks:
-      - backend
+
 
 volumes:
   redis-data:
-
-networks:
-  backend:

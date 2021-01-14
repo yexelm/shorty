@@ -17,45 +17,48 @@ docker-compose.yml
 POST /
 ```
 
-Save a full URL passed through POST request body in Redis and receive a unique short alias for it
+Saves a full URL passed through POST request body into Redis, generates and returns a unique short alias for this URL
 
 ```
-GET /:short_alias
+GET /<short_alias>
 ```
 
-Retrieve original full URL saved into Redis earlier by its short_alias
+Retrieves original full URL saved into Redis earlier by its <short_alias>
 
-## Env variables
+## Environment variables
 
+All env variables are set through .env file (example provided in the repository).
+
+- `HOST_PORT` application port
+- `CONTAINER_PORT` docker container port  
 - `REDIS_URL` URL used for connection to Redis
-- `DB_NUM` Redis db number for storing application data
-- `APP_PORT` application port
-- `TEST_DB_1` Redis db number used for testing storage
-- `TEST_DB_2` Redis db number used for testing handlers
+- `DB_NUM` Redis db number for storing application data (original URL to short alias relation)
+
+- `TEST_HANDLERS_DB` Redis db number used for testing handlers
+- `TEST_STORAGE_DB` Redis db number used for testing storage
 
 ## Make commands
 
-```shell
+```
 make test
 ```
 
 Builds shorty via docker-compose.test.yml, launches tests, stops and removes containers.
 
-```shell
+```
 make run
 ```
 
 Builds shorty via docker-compose.yml and runs it in Docker.
 
-```shell
+```
 make down
 ```
 
 Stops shorty running in Docker and removes all related containers.
 
-```shell
+```
 make clear
 ```
 
 Same as `make down` but also removes `redis-data` volume where application data is stored
-
