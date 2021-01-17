@@ -25,6 +25,33 @@ GET /<short_alias>
 
 Retrieves original full URL saved into Redis earlier by its <short_alias>
 
+## Example
+
+Do not forget to provide .env file
+```shell
+make run
+```
+```shell
+curl localhost:8080 -d 'google.com'
+```
+> localhost:8080/b
+```shell
+curl localhost:8080/b
+```
+> google.com
+```shell
+curl localhost:8080 -d 'golang.org'
+```
+> localhost:8080/c 
+ ```shell
+curl localhost:8080/c
+```
+> golang.org
+```shell
+curl localhost:8080 -d 'google.com'
+```
+> localhost:8080/b
+
 ## Environment variables
 
 All env variables are set through .env file (example provided in the repository).
@@ -43,7 +70,7 @@ All env variables are set through .env file (example provided in the repository)
 make test
 ```
 
-Builds shorty via docker-compose.test.yml, launches tests, stops and removes containers.
+Builds shorty via docker-compose.test.yml, launches tests, stops and removes built images.
 
 ```
 make run
