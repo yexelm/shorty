@@ -1,3 +1,4 @@
+[![Go Reference](https://pkg.go.dev/badge/github.com/yexelm/shorty.svg)](https://pkg.go.dev/github.com/yexelm/shorty)
 [![Go Report Card](https://goreportcard.com/badge/github.com/yexelm/shorty)](https://goreportcard.com/report/github.com/yexelm/shorty)
 
 # Description
