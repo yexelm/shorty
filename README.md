@@ -90,3 +90,6 @@ make clear
 ```
 
 Same as `make down` but also removes `redis-data` volume where application data is stored
+
+## Metrics
+Basic metrics are provided by Prometheus and available via ```/metrics``` handler

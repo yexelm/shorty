@@ -7,18 +7,29 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/yexelm/shorty/metrics"
+
 	"github.com/gomodule/redigo/redis"
+	"github.com/prometheus/client_golang/prometheus"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
 var (
 	errEmptyShortCode    = errors.New("empty short code")
 	errEmptyRequestBody  = errors.New("empty request body")
 	errShortCodeNotFound = errors.New("the requested short code not found")
+
+	// for metrics
+	methodToOperation = map[string]string{
+		http.MethodGet:  "Get original URL by short alias",
+		http.MethodPost: "Shorten the long URL",
+	}
 )
 
 func (a *App) newAPI() http.Handler {
 	m := http.NewServeMux()
 	m.HandleFunc("/", a.Shorty)
+	m.Handle("/metrics", promhttp.Handler())
 
 	return m
 }
@@ -27,6 +38,16 @@ func (a *App) newAPI() http.Handler {
 // GET: returns original URL by its short alias.
 // POST: generates and returns short alias for the given URL.
 func (a *App) Shorty(w http.ResponseWriter, r *http.Request) {
+	label, ok := methodToOperation[r.Method]
+	if !ok {
+		label = "operation not implemented"
+	}
+
+	obs := prometheus.NewTimer(prometheus.ObserverFunc(func(v float64) {
+		metrics.LatencyHandler.WithLabelValues(label).Observe(v)
+	}))
+	defer obs.ObserveDuration()
+
 	switch r.Method {
 	case http.MethodGet:
 		short := []byte(strings.TrimPrefix(r.URL.Path, "/"))
