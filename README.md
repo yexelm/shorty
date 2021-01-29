@@ -3,9 +3,8 @@
 
 # Description
 
-Shorty is a practice project showcasing a simple link shortener built on top of Redis. It can be run either locally or
-in Docker. If shorty is running in Docker, Redis persistently saves data into volume `redis-data` described in
-docker-compose.yml
+Shorty is a practice project showcasing a simple link shortener built on top of Redis. 
+It is intended to be run in Docker. Application data is stored in `/data` volume of Redis container.
 
 ## Dependencies
 
