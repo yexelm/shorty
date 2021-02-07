@@ -61,9 +61,6 @@ All env variables are set through .env file (example provided in the repository)
 - `REDIS_URL` URL used for connection to Redis
 - `DB_NUM` Redis db number for storing application data (original URL to short alias relation)
 
-- `TEST_HANDLERS_DB` Redis db number used for testing handlers
-- `TEST_STORAGE_DB` Redis db number used for testing storage
-
 ## Make commands
 
 ```

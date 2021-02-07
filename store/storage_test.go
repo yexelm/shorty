@@ -1,4 +1,4 @@
-package store
+package store_test
 
 import (
 	"bytes"
@@ -6,19 +6,23 @@ import (
 	"os"
 	"testing"
 
-	"github.com/yexelm/shorty/config"
+	"github.com/alicebob/miniredis/v2"
+	"github.com/yexelm/shorty/store"
 )
 
-var db *Storage
+var db *store.Storage
 
 func TestMain(m *testing.M) {
-	cfg := config.New()
+	s, err := miniredis.Run()
+	if err != nil {
+		panic(err)
+	}
+	defer s.Close()
 
-	db, _ = New(cfg.RedisURL, cfg.TestStorageDb)
+	db, _ = store.New(s.Addr(), 0)
 	code := m.Run()
 	conn := db.Pool.Get()
 	_, _ = conn.Do("FLUSHDB")
-	db.Close()
 	os.Exit(code)
 }
 

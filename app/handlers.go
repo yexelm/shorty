@@ -3,6 +3,7 @@ package app
 import (
 	"bytes"
 	"errors"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"strings"
@@ -15,9 +16,9 @@ import (
 )
 
 var (
-	errEmptyShortCode    = errors.New("empty short code")
-	errEmptyRequestBody  = errors.New("empty request body")
-	errShortCodeNotFound = errors.New("the requested short code not found")
+	ErrEmptyShortCode    = errors.New("empty short code")
+	ErrEmptyRequestBody  = errors.New("empty request body")
+	ErrShortCodeNotFound = errors.New("the requested short code not found")
 
 	// for metrics
 	methodToOperation = map[string]string{
@@ -34,7 +35,7 @@ func (a *App) newAPI() http.Handler {
 	return m
 }
 
-// Shorty is the handler which does different things based on request method.
+// Shorty is the handler which acts according to the request method.
 // GET: returns original URL by its short alias.
 // POST: generates and returns short alias for the given URL.
 func (a *App) Shorty(w http.ResponseWriter, r *http.Request) {
@@ -52,17 +53,20 @@ func (a *App) Shorty(w http.ResponseWriter, r *http.Request) {
 	case http.MethodGet:
 		short := []byte(strings.TrimPrefix(r.URL.Path, "/"))
 		if len(short) == 0 {
-			http.Error(w, errEmptyShortCode.Error(), http.StatusBadRequest)
+			w.WriteHeader(http.StatusBadRequest)
+			fmt.Fprint(w, ErrEmptyShortCode)
 			return
 		}
 
 		long, err := a.db.LongByShort(short)
 		if err != nil {
 			if err == redis.ErrNil {
-				http.Error(w, errShortCodeNotFound.Error(), http.StatusNotFound)
+				w.WriteHeader(http.StatusNotFound)
+				fmt.Fprint(w, ErrShortCodeNotFound)
 				return
 			}
-			http.Error(w, err.Error(), http.StatusInternalServerError)
+			w.WriteHeader(http.StatusInternalServerError)
+			fmt.Fprint(w, err.Error())
 			return
 		}
 
@@ -70,17 +74,20 @@ func (a *App) Shorty(w http.ResponseWriter, r *http.Request) {
 	case http.MethodPost:
 		longURL, err := ioutil.ReadAll(r.Body)
 		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
+			w.WriteHeader(http.StatusInternalServerError)
+			fmt.Fprint(w, err)
 			return
 		}
 		if len(longURL) == 0 {
-			http.Error(w, errEmptyRequestBody.Error(), http.StatusBadRequest)
+			w.WriteHeader(http.StatusBadRequest)
+			fmt.Fprint(w, ErrEmptyRequestBody)
 			return
 		}
 
 		short, err := a.db.ShortByLong(longURL)
 		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
+			w.WriteHeader(http.StatusInternalServerError)
+			fmt.Fprint(w, err)
 			return
 		}
 
@@ -91,6 +98,5 @@ func (a *App) Shorty(w http.ResponseWriter, r *http.Request) {
 		_, _ = w.Write(buf.Bytes())
 	default:
 		w.WriteHeader(http.StatusMethodNotAllowed)
-		return
 	}
 }

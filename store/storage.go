@@ -147,7 +147,7 @@ func (s *Storage) ShortByLong(longURL []byte) ([]byte, error) {
 // SaveFull generates a unique short alias for the given URL, saves the match between this alias and the given
 // URL into Redis and returns alias.
 func (s *Storage) SaveFull(longURL []byte) ([]byte, error) {
-	short := s.Hash()
+	short := hash(s.IDChannel)
 	conn := s.Pool.Get()
 	defer conn.Close()
 
@@ -164,15 +164,15 @@ func (s *Storage) SaveFull(longURL []byte) ([]byte, error) {
 	return short, nil
 }
 
-// Hash generates the unique short alias for the incoming link
-func (s *Storage) Hash() []byte {
+// hash generates the unique short alias for the incoming link
+func hash(IDChannel <-chan int) []byte {
 	const (
 		allowedChars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
 		lenChars     = len(allowedChars)
 	)
 
 	buf := new(bytes.Buffer)
-	id := <-s.IDChannel
+	id := <-IDChannel
 	for id > 0 {
 		// the returned error here is always nil according to godoc
 		_ = buf.WriteByte(allowedChars[id%lenChars])

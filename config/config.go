@@ -26,7 +26,7 @@ type Config struct {
 
 // New returns a new instance of Config
 func New() *Config {
-	c := new(Config)
+	c := Config{}
 	c.RedisURL = setStringField(redisURL, defaultRedisURL)
 
 	c.HostPort = setIntField(hostPort, defaultHostPort)
@@ -35,7 +35,7 @@ func New() *Config {
 	c.TestHandlersDb = setIntField(testHandlersDb, defaultTestHandlersDb)
 	c.TestStorageDb = setIntField(testStorageDb, defaultTestStorageDb)
 
-	return c
+	return &c
 }
 
 func setIntField(key string, defaultValue int) int {

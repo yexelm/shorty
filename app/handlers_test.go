@@ -1,28 +1,38 @@
-package app
+package app_test
 
 import (
 	"bytes"
 	"io"
+	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
 	"os"
 	"testing"
 
+	"github.com/yexelm/shorty/app"
 	"github.com/yexelm/shorty/config"
 	"github.com/yexelm/shorty/store"
+
+	"github.com/alicebob/miniredis/v2"
 )
 
-var app *App
+var a *app.App
 
 func TestMain(m *testing.M) {
 	cfg := config.New()
 
-	db, _ := store.New(cfg.RedisURL, cfg.TestHandlersDb)
-	app = New(db, cfg.HostPort)
+	s, err := miniredis.Run()
+	if err != nil {
+		panic(err)
+	}
+	defer s.Close()
+
+	db, _ := store.New(s.Addr(), 0)
+	a = app.New(db, cfg.HostPort)
 	code := m.Run()
 	conn := db.Pool.Get()
 	_, _ = conn.Do("FLUSHDB")
-	app.Stop()
+	a.Stop()
 	os.Exit(code)
 }
 
@@ -62,7 +72,7 @@ func TestShortyPostAndGet(t *testing.T) {
 			url:      "/",
 			body:     nil,
 			wantCode: http.StatusBadRequest,
-			wantBody: errEmptyShortCode.Error() + "\n",
+			wantBody: app.ErrEmptyShortCode.Error(),
 		},
 		{
 			name:     "wrong method",
@@ -80,7 +90,7 @@ func TestShortyPostAndGet(t *testing.T) {
 			url:      "/c",
 			body:     nil,
 			wantCode: http.StatusNotFound,
-			wantBody: errShortCodeNotFound.Error() + "\n",
+			wantBody: app.ErrShortCodeNotFound.Error(),
 		},
 		{
 			name:     "empty POST request body",
@@ -89,20 +99,20 @@ func TestShortyPostAndGet(t *testing.T) {
 			url:      "",
 			body:     bytes.NewReader([]byte("")),
 			wantCode: http.StatusBadRequest,
-			wantBody: errEmptyRequestBody.Error() + "\n",
+			wantBody: app.ErrEmptyRequestBody.Error(),
 		},
 	}
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
 			req, _ := http.NewRequest(tc.method, tc.url, tc.body)
-			app.Shorty(tc.recorder, req)
-
+			a.Shorty(tc.recorder, req)
 			gotCode := tc.recorder.Code
 			if gotCode != tc.wantCode {
 				t.Errorf("\ngot:  %v\nwant: %v\n", gotCode, tc.wantCode)
 			}
-			gotBody := tc.recorder.Body.String()
+			resp, _ := ioutil.ReadAll(tc.recorder.Result().Body)
+			gotBody := string(resp)
 			if gotBody != tc.wantBody {
 				t.Errorf("\ngot:  %v\nwant: %v\n", gotBody, tc.wantBody)
 			}

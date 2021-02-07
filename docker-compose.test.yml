@@ -17,8 +17,6 @@ services:
       - redis
     environment:
       REDIS_URL: ${REDIS_URL}
-      TEST_HANDLERS_DB: ${TEST_HANDLERS_DB}
-      TEST_STORAGE_DB: ${TEST_STORAGE_DB}
 
   redis:
     image: "redis:alpine"
