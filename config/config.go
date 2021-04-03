@@ -6,22 +6,18 @@ import (
 )
 
 const (
-	redisURL, defaultRedisURL             = "REDIS_URL", "redis:6379"
-	hostPort, defaultHostPort             = "HOST_PORT", 8080
-	containerPort, defaultContainerPort   = "CONTAINER_PORT", 8080
-	dbNum, defaultDbNum                   = "DB_NUM", 0
-	testHandlersDb, defaultTestHandlersDb = "TEST_HANDLERS_DB", 12
-	testStorageDb, defaultTestStorageDb   = "TEST_STORAGE_DB", 13
+	redisURL, defaultRedisURL           = "REDIS_URL", "redis:6379"
+	hostPort, defaultHostPort           = "HOST_PORT", 8080
+	containerPort, defaultContainerPort = "CONTAINER_PORT", 8080
+	dbNum, defaultDbNum                 = "DB_NUM", 0
 )
 
 // Config contains app configuration
 type Config struct {
-	RedisURL       string
-	HostPort       int
-	ContainerPort  int
-	DbNum          int
-	TestHandlersDb int
-	TestStorageDb  int
+	RedisURL      string
+	HostPort      int
+	ContainerPort int
+	DbNum         int
 }
 
 // New returns a new instance of Config
@@ -32,8 +28,6 @@ func New() *Config {
 	c.HostPort = setIntField(hostPort, defaultHostPort)
 	c.ContainerPort = setIntField(containerPort, defaultContainerPort)
 	c.DbNum = setIntField(dbNum, defaultDbNum)
-	c.TestHandlersDb = setIntField(testHandlersDb, defaultTestHandlersDb)
-	c.TestStorageDb = setIntField(testStorageDb, defaultTestStorageDb)
 
 	return &c
 }

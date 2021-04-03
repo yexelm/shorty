@@ -107,41 +107,31 @@ func newPool(redisURL string, db int) *redis.Pool {
 	return &p
 }
 
-// LongByShort searches the original URL in Redis by given short alias.
-func (s *Storage) LongByShort(short []byte) ([]byte, error) {
+// Longer searches the original URL in Redis by given short alias.
+func (s *Storage) Longer(short []byte) ([]byte, error) {
 	conn := s.Pool.Get()
 	defer conn.Close()
 
-	long, err := redis.Bytes(conn.Do("HGET", shortToLong, short))
-	if err != nil {
-		if err == redis.ErrNil {
-			return nil, err
-		}
-		return nil, err
-	}
-
-	return long, nil
+	return redis.Bytes(conn.Do("HGET", shortToLong, short))
 }
 
-// ShortByLong checks if the given URL has a short version saved earlier. If not, it saves it into Redis and returns
+// Shorter checks if the given URL has a short version saved earlier. If not, it saves it into Redis and returns
 // a short alias for the given URL.
-func (s *Storage) ShortByLong(longURL []byte) ([]byte, error) {
+func (s *Storage) Shorter(longURL []byte) ([]byte, error) {
 	conn := s.Pool.Get()
 	defer conn.Close()
 
 	short, err := redis.Bytes(conn.Do("HGET", longToShort, longURL))
-	if err != nil {
-		if err == redis.ErrNil {
-			short, err = s.SaveFull(longURL)
-			if err != nil {
-				return nil, err
-			}
-			return short, nil
-		}
-		return nil, err
+	if err == nil {
+		return short, nil
 	}
 
-	return short, nil
+	if err == redis.ErrNil {
+		return s.SaveFull(longURL)
+	}
+
+	return nil, err
+
 }
 
 // SaveFull generates a unique short alias for the given URL, saves the match between this alias and the given
