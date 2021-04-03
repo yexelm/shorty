@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	"github.com/alicebob/miniredis/v2"
+
 	"github.com/yexelm/shorty/store"
 )
 
@@ -26,9 +27,9 @@ func TestMain(m *testing.M) {
 	os.Exit(code)
 }
 
-//TestShortByLong checks if each new URL gets a new short alias and each URL already contained in Redis get the
-//same short alias.
-func TestShortByLong(t *testing.T) {
+// TestShorter checks if each new URL gets a new short alias and each URL already contained in Redis get the
+// same short alias.
+func Test_Shorter(t *testing.T) {
 	tests := []struct {
 		longURL []byte
 		want    []byte
@@ -63,7 +64,7 @@ func TestShortByLong(t *testing.T) {
 
 	for _, tc := range tests {
 		t.Run(string(tc.longURL), func(t *testing.T) {
-			got, gotErr := db.ShortByLong(tc.longURL)
+			got, gotErr := db.Shorter(tc.longURL)
 			if !bytes.Equal(got, tc.want) {
 				t.Errorf("\ngot:  %q\nwant: %q\n", got, tc.want)
 			}
@@ -74,9 +75,9 @@ func TestShortByLong(t *testing.T) {
 	}
 }
 
-// TestSaveFullLongByShort tries to insert <urlsNum> URLs into Redis and checks if each of them can be retrieved by its
+// TestLonger tries to insert <urlsNum> URLs into Redis and checks if each of them can be retrieved by its
 // short alias correctly afterwards.
-func TestSaveFullLongByShort(t *testing.T) {
+func Test_Longer(t *testing.T) {
 	const (
 		urlsNum = 1000
 	)
@@ -97,7 +98,7 @@ func TestSaveFullLongByShort(t *testing.T) {
 	}
 
 	for l, s := range longToShortMap {
-		long, err := db.LongByShort(s)
+		long, err := db.Longer(s)
 		if err != nil {
 			t.Fatal(err)
 		}

@@ -1,4 +1,5 @@
-FROM golang:1.15.6-alpine AS build
+FROM golang:1.16-alpine AS build
+
 LABEL stage=builder
 RUN apk update && apk upgrade && \
     apk add --no-cache bash git

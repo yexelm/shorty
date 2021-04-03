@@ -10,11 +10,6 @@ up:
 down:
 	docker-compose -f docker-compose.yml --env-file ./.env down
 
-.PHONY: test
-test:
-	docker-compose -f docker-compose.test.yml --env-file ./.env up --build --abort-on-container-exit
-	docker-compose -f docker-compose.test.yml --env-file ./.env down -v --rmi 'all'
-
 .PHONY: clear
 clear:
 	docker-compose -f docker-compose.yml --env-file ./.env down -v

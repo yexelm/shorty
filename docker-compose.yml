@@ -7,7 +7,7 @@ services:
       - .env
     build:
       context: .
-      dockerfile: Dockerfile.dev
+      dockerfile: Dockerfile
     ports:
       - ${HOST_PORT}:${CONTAINER_PORT}
     restart: unless-stopped

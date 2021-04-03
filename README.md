@@ -8,7 +8,7 @@ It is intended to be run in Docker. Application data is stored in `/data` volume
 
 ## Dependencies
 
-- `go 1.15`
+- `go 1.16`
 - `docker`
 
 ## API
@@ -62,12 +62,6 @@ All env variables are set through .env file (example provided in the repository)
 - `DB_NUM` Redis db number for storing application data (original URL to short alias relation)
 
 ## Make commands
-
-```
-make test
-```
-
-Builds shorty via docker-compose.test.yml, launches tests, stops and removes built images.
 
 ```
 make run
