@@ -14,7 +14,7 @@ It is intended to be run in Docker. Application data is stored in `/data` volume
 ## API
 
 ```
-POST /
+POST / -d '<original URL>'
 ```
 
 Saves a full URL passed through POST request body into Redis, generates and returns a unique short alias for this URL
