@@ -9,12 +9,44 @@ import (
 	"github.com/valyala/fasthttp"
 )
 
-func initCtx(URI string, body []byte) *fasthttp.RequestCtx {
+func initCtx(method, URI string, body []byte) *fasthttp.RequestCtx {
 	ctx := &fasthttp.RequestCtx{}
 	ctx.Request.SetRequestURI(URI)
 	ctx.Request.SetHostBytes(ctx.Request.URI().Host())
 	ctx.Request.SetBody(body)
+	ctx.Request.Header.SetMethod(method)
 	return ctx
+}
+
+func Test_Handle(t *testing.T) {
+	t.Parallel()
+	ao := assert.New(t)
+	mockEnv, env := loadMockEnv(t)
+	defer mockEnv.Ctrl.Finish()
+
+	type testData struct {
+		tCase  string
+		method string
+
+		expectedCode int
+	}
+
+	testTable := []testData{
+		{
+			tCase:        "method not allowed",
+			method:       "PUT",
+			expectedCode: fasthttp.StatusMethodNotAllowed,
+		},
+	}
+
+	for _, tc := range testTable {
+		t.Run(tc.tCase, func(t *testing.T) {
+			ctx := initCtx(tc.method, "", nil)
+
+			env.Handle(ctx)
+			ao.Equal(tc.expectedCode, ctx.Response.StatusCode())
+		})
+	}
 }
 
 func Test_longer(t *testing.T) {
@@ -78,9 +110,9 @@ func Test_longer(t *testing.T) {
 
 	for _, tc := range testTable {
 		t.Run(tc.tCase, func(t *testing.T) {
-			tc.ctx = initCtx(tc.URI, nil)
+			tc.ctx = initCtx("GET", tc.URI, nil)
 			tc.expectedFunc()
-			env.longer(tc.ctx)
+			env.Handle(tc.ctx)
 
 			ao.Equal(tc.expectedCode, tc.ctx.Response.StatusCode())
 			ao.Equal(tc.expectedBody, string(tc.ctx.Response.Body()))
@@ -138,9 +170,9 @@ func Test_shorter(t *testing.T) {
 
 	for _, tc := range testTable {
 		t.Run(tc.tCase, func(t *testing.T) {
-			tc.ctx = initCtx("http://host.com", tc.body)
+			tc.ctx = initCtx("POST", "http://host.com", tc.body)
 			tc.expectedFunc()
-			env.shorter(tc.ctx)
+			env.Handle(tc.ctx)
 
 			ao.Equal(tc.expectedCode, tc.ctx.Response.StatusCode())
 			ao.Equal(tc.expectedBody, string(tc.ctx.Response.Body()))
