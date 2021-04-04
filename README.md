@@ -17,7 +17,7 @@ It is intended to be run in Docker. Application data is stored in `/data` volume
 POST / -d '<original URL>'
 ```
 
-Saves a full URL passed through POST request body into Redis, generates and returns a unique short alias for this URL
+Saves an original URL passed via POST request body into Redis, generates and returns a unique short alias for the original URL. If this URL is already present in Redis, simply returns an existing alias for it.
 
 ```
 GET /<short_alias>
@@ -27,7 +27,6 @@ Retrieves original full URL saved into Redis earlier by its <short_alias>
 
 ## Example
 
-Do not forget to provide .env file
 ```shell
 make run
 ```
@@ -54,12 +53,12 @@ curl localhost:8080 -d 'google.com'
 
 ## Environment variables
 
-All env variables are set through .env file (example provided in the repository).
+All env variables can be set in the .env file (example provided in the repository).
 
-- `HOST_PORT` application port
-- `CONTAINER_PORT` docker container port  
-- `REDIS_URL` URL used for connection to Redis
-- `DB_NUM` Redis db number for storing application data (original URL to short alias relation)
+- `HOST_PORT` application port;
+- `CONTAINER_PORT` docker container port;
+- `REDIS_URL` URL used for connection to Redis;
+- `DB_NUM` Redis db number where the data is stored.
 
 ## Make commands
 
@@ -73,13 +72,13 @@ Builds shorty via docker-compose.yml and runs it in Docker.
 make down
 ```
 
-Stops shorty running in Docker and removes all related containers.
+Stops shorty containers running in Docker and removes all related images.
 
 ```
 make clear
 ```
 
-Same as `make down` but also removes `redis-data` volume where application data is stored
+Same as `make down` but also removes `redis-data` volume where the application data is stored.
 
 ## Metrics
-Basic metrics are provided by Prometheus and available via ```/metrics``` handler
+Basic metrics are provided by Prometheus and available via `/metrics` handler on the `:8081` port.
