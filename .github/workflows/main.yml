@@ -21,7 +21,5 @@ jobs:
 
     - name: Test
       run: |
-        pwd
-        ls
-        cd ..
+        cd ./shorty
         ls
