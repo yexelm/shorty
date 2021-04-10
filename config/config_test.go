@@ -59,7 +59,7 @@ func Test_setIntField(t *testing.T) {
 			tCase:        "success",
 			key:          "foo",
 			defaultValue: 0,
-			expected:     125,
+			expected:     124,
 		},
 		{
 			tCase:        "default value",
