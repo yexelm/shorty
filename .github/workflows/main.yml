@@ -19,7 +19,5 @@ jobs:
         stable: true
       id: go
 
-    - name: Run a multi-line script
-      run: |
-        go mod download
-        go test -v
+    - name: Test
+      run: go test ./... -v
