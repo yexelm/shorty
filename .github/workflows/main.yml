@@ -20,6 +20,4 @@ jobs:
       id: go
 
     - name: Test
-      run: |       
-        pwd 
-        ll
+      run: go test ./... -v
